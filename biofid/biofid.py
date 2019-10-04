@@ -139,7 +139,7 @@ class BIOfidDataset(utils.Dataset):
             else:
                 polygons = [{**r['shape_attributes'], **r['region_attributes']} for r in a['regions']]
 
-                # load_mask() needs the image size to convert polygons to masks.
+            # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
             # the image. This is only managable since the dataset is tiny.
             image_path = os.path.join(dataset_dir, a['filename'])
@@ -179,9 +179,10 @@ class BIOfidDataset(utils.Dataset):
             elif p['name'] == 'rect':
                 x, y = p['x'], p['y']
                 w, h = p['width'], p['height']
-                mask[x:x + w, y:y + h, i] = 1
+                mask[y:y + w, x:x + h, i] = 1
             else:
                 raise ValueError(f"'{p['name']}' is an unsupported shape attribute type!")
+
             # Set the class id
             class_ids[i] = self.class_lookup[p['type']]
 
