@@ -135,9 +135,9 @@ class BIOfidDataset(utils.Dataset):
             # shape_attributes (see json format above)
             # The if condition is needed to support VIA versions 1.x and 2.x.
             if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
+                polygons = [r['shape_attributes'] + r['region_attributes'] for r in a['regions'].values()]
             else:
-                polygons = [r['shape_attributes'] for r in a['regions']]
+                polygons = [r['shape_attributes'] + r['region_attributes'] for r in a['regions']]
 
                 # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
@@ -145,7 +145,6 @@ class BIOfidDataset(utils.Dataset):
             image_path = os.path.join(dataset_dir, a['filename'])
             image = skimage.io.imread(image_path)
             height, width = image.shape[:2]
-            print(a['filename'])
 
             self.add_image(
                 "BIOfid",
@@ -184,7 +183,7 @@ class BIOfidDataset(utils.Dataset):
             else:
                 raise ValueError(f"'{p['name']}' is an unsupported shape attribute type!")
             # Set the class id
-            class_ids[i] = self.class_lookup[p['region_attributes']['type']]
+            class_ids[i] = self.class_lookup[p['type']]
 
         # Return mask, and array of class IDs of each instance.
         return mask.astype(np.bool), class_ids
