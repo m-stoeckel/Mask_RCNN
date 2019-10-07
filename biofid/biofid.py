@@ -32,6 +32,9 @@ import json
 import os
 import sys
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
+import tensorflow as tf
 import numpy as np
 import skimage.draw
 
@@ -179,7 +182,11 @@ class BIOfidDataset(utils.Dataset):
             elif p['name'] == 'rect':
                 x, y = p['x'], p['y']
                 w, h = p['width'], p['height']
-                mask[y:y + w, x:x + h, i] = 1
+                xw = x + w
+                yh = y + h
+
+                rr, cc = skimage.draw.polygon([y, y, yh, yh], [x, xw, xw, x])
+                mask[rr, cc, i] = 1
             else:
                 raise ValueError(f"'{p['name']}' is an unsupported shape attribute type!")
 
